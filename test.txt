@@ -1,0 +1,127 @@
+
+
+********************ENTETE************************
+/**
+ * @brief Change le répertoire de travail courant.
+ *
+ * La fonction `ft_cd` implémente le comportement de la commande `cd` dans un shell.
+ * Elle permet de modifier le répertoire courant du processus en appelant `chdir()`.
+ * 
+ * Si aucun argument n'est fourni, la fonction tente de se déplacer vers le répertoire
+ * contenu dans la variable d'environnement `HOME`. Si cette variable n'est pas définie,
+ * un message d'erreur est affiché.
+ *
+ * Si un chemin est fourni en argument, la fonction essaie d'y accéder avec `chdir()`.
+ * En cas d’échec (chemin inexistant, permissions insuffisantes, etc.), un message
+ * d’erreur est affiché via `perror()` et la fonction retourne une valeur d’échec.
+ * 
+ * Cette fonction permet de changer le répertoire courant de travail.
+ * Le chemin vers le nouveau dossier doit être passé en paramètre.
+ * Le nouveau chemin peut être exprimé en absolu (à partir de la racine de votre système de fichier) ou relativement au répertoire courant. 
+ *
+ * @param args Tableau de chaînes de caractères, contenant :
+ *   - args[0] : la commande `cd`
+ *   - args[1] : (optionnel) le chemin cible
+ *   - args[2] : NULL
+ *
+ * @return `0` si le changement de répertoire a réussi,
+ *         `1` en cas d’erreur (chemin invalide ou `HOME` introuvable).
+ *
+ * @note Cette fonction modifie le répertoire courant du processus **Minishell**.
+ *       Elle ne doit pas être exécutée dans un processus enfant, sinon le changement
+ *       serait perdu à la fin du `fork`.
+ */
+
+
+
+*******************PROBLEME***********************
+    ===> je me base sur la copie des variables d'environement  passee au main(**envp)
+            (initialisee au moment du lancement du programme) 
+            mais il faut que je me base sur les variable d'environement du minishell et pas ceux passe au main?
+
+    ===> il faut que j'update la varible denvironement
+
+
+
+
+
+int	exect_cd(char **envp, char *path)
+{
+    int res;
+
+    res = chdir(path);
+    if (res == -1)
+    {
+        ft_putendl_fd("chdir() err", 1);
+        return (1);
+    }
+    if (res == 0)
+    //... = changer la variable denvironement du path
+        update_pwd( ..., path);
+    
+}
+
+int search_var(char **env_var, char *s)
+{
+    int i;
+
+    i = 0;
+    while (env_var[i])
+    {
+        /* !!!mauvais comportement HOME=...!!!*/
+        if (ft_strcmp(env_var[i], s) == 0)
+            return (0);
+    }
+    return (1);
+}
+
+int		ft_cd(int argc, char **argv, char **envp)
+{
+    if (argc == 2)
+        return 1;
+    
+    return (0);
+}
+
+
+
+
+
+***********************man************************
+#include <unistd.h>
+int chdir(const char *path);
+DESCRIPTION:
+        chdir()  changes  the current working directory of the calling process
+        to the directory specified in path.
+RETURN VALUE:
+       On success, zero is returned.  
+       On error, -1 is returned, and errno is set appropriately.
+
+
+#include <unistd.h>
+ char *getcwd(char *buf, size_t size);
+
+DESCRIPTION:
+
+       These functions return a null-terminated string containing an absolute pathname that is the current working directory of the calling process.  The pathname is returned as the function result and via the argument buf, if present.
+
+       The getcwd() function copies an absolute pathname of the current working directory to the array pointed to by buf, which is of length size.
+
+       If the length of the absolute pathname of the current working directory, including the terminating null byte, exceeds size bytes, NULL is returned, and errno is set to ERANGE; an application should check for this error, and allocate a larger buffer if necessary.
+
+       As  an extension to the POSIX.1-2001 standard, glibc's getcwd() allocates the buffer dynamically using malloc(3) if buf is NULL.  In this case, the allocated buffer has the length size unless size is zero, when buf is allocated as big as necessary.  The caller should
+       free(3) the returned buffer.
+
+       get_current_dir_name() will malloc(3) an array big enough to hold the absolute pathname of the current working directory.  If the environment variable PWD is set, and its value is correct, then that value will be returned.  The caller should free(3) the returned buf‐
+       fer.
+
+       getwd()  does  not malloc(3) any memory.  The buf argument should be a pointer to an array at least PATH_MAX bytes long.  If the length of the absolute pathname of the current working directory, including the terminating null byte, exceeds PATH_MAX bytes, NULL is re‐
+       turned, and errno is set to ENAMETOOLONG.  (Note that on some systems, PATH_MAX may not be a compile-time constant; furthermore, its value may depend on the filesystem, see pathconf(3).)  For portability and security reasons, use of getwd() is deprecated.
+
+
+
+RETURN VALUE:
+       On success, these functions return a pointer to a string containing the pathname of the current working directory.  In the case of getcwd() and getwd() this is the same value as buf.
+
+       On failure, these functions return NULL, and errno is set to indicate the error.  The contents of the array pointed to by buf are undefined on error.
+
